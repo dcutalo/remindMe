@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/bwmarrin/discordgo"
@@ -40,7 +41,10 @@ var (
 func main() {
 	r := mux.NewRouter()
 	// returns instance of discord bot
-	discord, err := discordgo.New("Bot " + "")
+
+	token := os.Getenv("BOTTOKEN")
+
+	discord, err := discordgo.New("Bot " + token)
 	if err != nil {
 		log.Fatalf("Failed to create discord bot %s", err)
 	}
