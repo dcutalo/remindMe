@@ -1,6 +1,7 @@
 package main
 
 import (
+	"database/sql"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -11,6 +12,7 @@ import (
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/gorilla/mux"
+	_ "github.com/lib/pq"
 )
 
 // Setup HTTP server
@@ -20,10 +22,17 @@ import (
 
 // Setup temproal
 // Create database
-//
+
+// const (
+// 	port = "8080"
+// )
 
 const (
-	port = "8080"
+	host     = "localhost"
+	port     = "5432"
+	user     = "dcutalo"
+	password = "diesel"
+	dbname   = "postgres"
 )
 
 type CreateReminder struct {
@@ -40,10 +49,28 @@ var (
 
 func main() {
 	r := mux.NewRouter()
-	// returns instance of discord bot
+
+	// connection string
+	psqlInfo := fmt.Sprintf("host=%s port=%s user=%s "+
+		"password=%s dbname=%s sslmode=disable",
+		host, port, user, password, dbname)
+	println("connection string: %s", psqlInfo)
+	// validates credentials
+	db, err := sql.Open("postgres", psqlInfo)
+	if err != nil {
+		log.Fatalf("Invalid database credentials: %s", err)
+	}
+	defer db.Close()
+	// ping open connection
+	err = db.Ping()
+	if err != nil {
+		log.Fatalf("Connection failed to open: %s", err)
+	}
+	//
 
 	token := os.Getenv("BOTTOKEN")
-
+	log.Printf("token: %s", token)
+	// returns instance of discord bot
 	discord, err := discordgo.New("Bot " + token)
 	if err != nil {
 		log.Fatalf("Failed to create discord bot %s", err)
@@ -58,7 +85,7 @@ func main() {
 	}
 	defer discord.Close()
 
-	sendMessage(discord)
+	//sendMessage(discord)
 
 	r.HandleFunc("/reminder", CreateReminderHandler).Methods("POST")
 	r.HandleFunc("/reminder/{id}", UpdateReminderHandler).Methods("PUT")
@@ -72,7 +99,7 @@ func main() {
 
 func sendMessage(discord *discordgo.Session) {
 	message, err := discord.ChannelMessageSend(
-		"724706617051840685", "Hello Ping Pong bot here!",
+		"724706617051840685", "Hello remindme bot here!",
 	)
 	if err != nil {
 		log.Printf("Failed to send message %s", err)
