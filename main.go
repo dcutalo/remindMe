@@ -28,11 +28,10 @@ import (
 // )
 
 const (
-	host     = "localhost"
-	port     = "5432"
-	user     = "dcutalo"
-	password = "diesel"
-	dbname   = "postgres"
+	host   = "localhost"
+	port   = "5432"
+	user   = "dcutalo"
+	dbname = "postgres"
 )
 
 type CreateReminder struct {
@@ -49,7 +48,7 @@ var (
 
 func main() {
 	r := mux.NewRouter()
-
+	password := os.Getenv("DBPASSWORD")
 	// connection string
 	psqlInfo := fmt.Sprintf("host=%s port=%s user=%s "+
 		"password=%s dbname=%s sslmode=disable",
@@ -85,7 +84,7 @@ func main() {
 	}
 	defer discord.Close()
 
-	//sendMessage(discord)
+	sendMessage(discord)
 
 	r.HandleFunc("/reminder", CreateReminderHandler).Methods("POST")
 	r.HandleFunc("/reminder/{id}", UpdateReminderHandler).Methods("PUT")
