@@ -2,13 +2,13 @@ package main
 
 import (
 	"database/sql"
-	"encoding/json"
 	"flag"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
-	"time"
+
+	rm "github.com/dcutalo/remindme/pkg/remindme"
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/gorilla/mux"
@@ -20,27 +20,16 @@ import (
 // Create route handlers
 // Create models for our data structures
 
-// Setup temproal
+// Setup temporal
 // Create database
 
-// const (
-// 	port = "8080"
-// )
-
 const (
+	port   = "8080"
 	host   = "localhost"
-	port   = "5432"
+	dbport = "5432"
 	user   = "dcutalo"
 	dbname = "postgres"
 )
-
-type CreateReminder struct {
-	Title        string    `json:"title"`
-	Descrption   string    `json:"descreption"`
-	Tags         []string  `json:"tags"`
-	ReminderTime time.Time `json:"reminderTime"`
-	RemindType   string    `json:"reminderType"`
-}
 
 var (
 	BotToken = flag.String("token", "", "Bot token")
@@ -52,7 +41,7 @@ func main() {
 	// connection string
 	psqlInfo := fmt.Sprintf("host=%s port=%s user=%s "+
 		"password=%s dbname=%s sslmode=disable",
-		host, port, user, password, dbname)
+		host, dbport, user, password, dbname)
 	println("connection string: %s", psqlInfo)
 	// validates credentials
 	db, err := sql.Open("postgres", psqlInfo)
@@ -65,7 +54,6 @@ func main() {
 	if err != nil {
 		log.Fatalf("Connection failed to open: %s", err)
 	}
-	//
 
 	token := os.Getenv("BOTTOKEN")
 	log.Printf("token: %s", token)
@@ -84,9 +72,19 @@ func main() {
 	}
 	defer discord.Close()
 
-	sendMessage(discord)
+	// these calls would go in event handlers which will recieve
+	// json data that will be used to fill out necessary fields
+	//sendMessage(discord)
+	//CreateInsertReminder(db)
+	//CreateInsertUser(db)
 
-	r.HandleFunc("/reminder", CreateReminderHandler).Methods("POST")
+	rmapi := &rm.RemindMeAPI{
+		ReminderManager: rm.ReminderManager{
+			Db: db,
+		},
+	}
+
+	r.HandleFunc("/reminder", rmapi.CreateReminderHandler).Methods("POST")
 	r.HandleFunc("/reminder/{id}", UpdateReminderHandler).Methods("PUT")
 	r.HandleFunc("/reminder/{id}", DeleteReminderHandler).Methods("DELETE")
 	r.HandleFunc("/reminder/{id}", GetReminderHandler).Methods("GET")
@@ -106,14 +104,15 @@ func sendMessage(discord *discordgo.Session) {
 	log.Printf("message to be sent: %s", message)
 }
 
-func CreateReminderHandler(w http.ResponseWriter, r *http.Request) {
-	var reminder CreateReminder
-	json.NewDecoder(r.Body).Decode(&reminder)
-
-	fmt.Printf("%v\n", reminder)
-
-	w.Write([]byte("create"))
-	w.WriteHeader(200)
+func CreateInsertUser(db *sql.DB) {
+	sqlStatement := `
+	INSERT INTO product_user (user_name, channel_id)
+	VALUES ($1, $2)`
+	res, err := db.Exec(sqlStatement, "Charlie", "4321")
+	if err != nil {
+		log.Fatalf("Failed to insert into database table product_user: %s", err)
+	}
+	log.Printf("Result of insert query: %s", res)
 }
 
 func UpdateReminderHandler(w http.ResponseWriter, r *http.Request) {
