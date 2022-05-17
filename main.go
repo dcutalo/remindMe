@@ -72,11 +72,7 @@ func main() {
 	}
 	defer discord.Close()
 
-	// these calls would go in event handlers which will recieve
-	// json data that will be used to fill out necessary fields
 	//sendMessage(discord)
-	//CreateInsertReminder(db)
-	//CreateInsertUser(db)
 
 	rmapi := &rm.RemindMeAPI{
 		ReminderManager: rm.ReminderManager{
@@ -85,10 +81,13 @@ func main() {
 	}
 
 	r.HandleFunc("/reminder", rmapi.CreateReminderHandler).Methods("POST")
-	r.HandleFunc("/reminder/{id}", UpdateReminderHandler).Methods("PUT")
-	r.HandleFunc("/reminder/{id}", DeleteReminderHandler).Methods("DELETE")
-	r.HandleFunc("/reminder/{id}", GetReminderHandler).Methods("GET")
-	r.HandleFunc("/reminder", SearchReminderHandler).Methods("GET")
+	r.HandleFunc("/reminder/{id}", rmapi.UpdateReminderHandler).Methods("PUT")
+	r.HandleFunc("/reminder/{id}", rmapi.DeleteReminderHandler).Methods("DELETE")
+	r.HandleFunc("/reminder/{id}", rmapi.GetReminderHandler).Methods("GET")
+	//r.HandleFunc("/reminder", SearchReminderHandler).Methods("GET")
+
+	r.HandleFunc("/user", rmapi.CreateUserHandler).Methods("POST")
+	r.HandleFunc("/user/{id}", rmapi.DeleteUserHandler).Methods("DELETE")
 
 	log.Printf("Starting server on [%s]", port)
 	http.ListenAndServe(fmt.Sprintf(":%s", port), r)
@@ -104,36 +103,10 @@ func sendMessage(discord *discordgo.Session) {
 	log.Printf("message to be sent: %s", message)
 }
 
-func CreateInsertUser(db *sql.DB) {
-	sqlStatement := `
-	INSERT INTO product_user (user_name, channel_id)
-	VALUES ($1, $2)`
-	res, err := db.Exec(sqlStatement, "Charlie", "4321")
-	if err != nil {
-		log.Fatalf("Failed to insert into database table product_user: %s", err)
-	}
-	log.Printf("Result of insert query: %s", res)
-}
-
-func UpdateReminderHandler(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("update"))
-	w.WriteHeader(200)
-}
-
-func DeleteReminderHandler(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("delete"))
-	w.WriteHeader(200)
-}
-
 func GetReminderHandler(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	id := params["id"]
 	fmt.Println(id)
 	w.Write([]byte("Get"))
-	w.WriteHeader(200)
-}
-
-func SearchReminderHandler(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Search"))
 	w.WriteHeader(200)
 }

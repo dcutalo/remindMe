@@ -1,4 +1,5 @@
 create table product_user (
+  user_id int PRIMARY KEY,
   user_name text,
   channel_id text
 );

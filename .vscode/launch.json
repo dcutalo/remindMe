@@ -11,8 +11,8 @@
             "mode": "auto",
             "program": "${fileDirname}",
             "env": {
-                "DBPASSWORD":"diesel",
-                "BOTTOKEN":"OTY4NjczNzc2Njc2MDEyMDMy.YmiRwQ.qa2dXem2LuiLn_AVNV4Mljwt8Pk",
+                "DBPASSWORD":"",
+                "BOTTOKEN":"",
             }
         }
     ]
