@@ -1,13 +1,8 @@
 package remindme
 
 import (
-	"database/sql"
 	"time"
 )
-
-type ReminderManager struct {
-	Db *sql.DB
-}
 
 type Reminder struct {
 	ReminderId

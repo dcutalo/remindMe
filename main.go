@@ -78,6 +78,9 @@ func main() {
 		ReminderManager: rm.ReminderManager{
 			Db: db,
 		},
+		UserManager: rm.UserManager{
+			Db: db,
+		},
 	}
 
 	r.HandleFunc("/reminder", rmapi.CreateReminderHandler).Methods("POST")

@@ -8,6 +8,7 @@ import (
 
 type RemindMeAPI struct {
 	ReminderManager ReminderManager
+	UserManager     UserManager
 }
 
 func (rmapi *RemindMeAPI) CreateReminderHandler(w http.ResponseWriter, r *http.Request) {
@@ -91,7 +92,7 @@ func (rmapi *RemindMeAPI) CreateUserHandler(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	if err := rmapi.ReminderManager.CreateInsertUser(user); err != nil {
+	if err := rmapi.UserManager.CreateInsertUser(user); err != nil {
 		w.Write([]byte(fmt.Sprintf("unable to create user %s", err.Error())))
 		w.WriteHeader(500)
 		return
@@ -109,7 +110,7 @@ func (rmapi *RemindMeAPI) DeleteUserHandler(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	if err := rmapi.ReminderManager.DeleteUser(user); err != nil {
+	if err := rmapi.UserManager.DeleteUser(user); err != nil {
 		w.Write([]byte(fmt.Sprintf("unable to delete user %s", err.Error())))
 		w.WriteHeader(500)
 		return
@@ -127,7 +128,7 @@ func (rmapi *RemindMeAPI) UpdateUserHandler(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	if err := rmapi.ReminderManager.UpdateUser(user); err != nil {
+	if err := rmapi.UserManager.UpdateUser(user); err != nil {
 		w.Write([]byte(fmt.Sprintf("unable to update user %s", err.Error())))
 		w.WriteHeader(500)
 		return
@@ -145,7 +146,7 @@ func (rmapi *RemindMeAPI) GetUserHandler(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	if err := rmapi.ReminderManager.GetUser(user); err != nil {
+	if err := rmapi.UserManager.GetUser(user); err != nil {
 		w.Write([]byte(fmt.Sprintf("unable to get user %s", err.Error())))
 		w.WriteHeader(500)
 		return
