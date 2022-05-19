@@ -1,10 +1,19 @@
 package remindme
 
-import "time"
+import (
+	"database/sql"
+	"time"
+)
+
+type ReminderManager struct {
+	Db *sql.DB
+}
 
 type Reminder struct {
-	Title       string `json:"title"`
-	Description string `json:"description"`
+	ReminderId
+	Title        string    `json:"title"`
+	Description  string    `json:"reminder_message"`
+	ReminderTime time.Time `json:"time_to_remind"`
 }
 
 type ReminderId struct {
@@ -13,15 +22,13 @@ type ReminderId struct {
 
 type CreateReminder struct {
 	Reminder
-	Tags         []string  `json:"tags"`
-	ReminderTime time.Time `json:"reminderTime"`
-	RemindType   string    `json:"reminderType"`
 }
+
+//Tags         []string  `json:"tags"`
+//RemindType   string    `json:"reminderType"`
 
 type UpdateReminder struct {
 	Reminder
-	ReminderId
-	ReminderTime time.Time `json:"reminderTime"`
 }
 
 type DeleteReminder struct {
@@ -47,6 +54,14 @@ type CreateUser struct {
 	User
 }
 
+type UpdateUser struct {
+	User
+}
+
 type DeleteUser struct {
+	UserId
+}
+
+type GetUser struct {
 	UserId
 }

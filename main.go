@@ -88,6 +88,8 @@ func main() {
 
 	r.HandleFunc("/user", rmapi.CreateUserHandler).Methods("POST")
 	r.HandleFunc("/user/{id}", rmapi.DeleteUserHandler).Methods("DELETE")
+	r.HandleFunc("/user/{id}", rmapi.UpdateUserHandler).Methods("PUT")
+	r.HandleFunc("/user/{id}", rmapi.GetUserHandler).Methods("GET")
 
 	log.Printf("Starting server on [%s]", port)
 	http.ListenAndServe(fmt.Sprintf(":%s", port), r)
@@ -101,12 +103,4 @@ func sendMessage(discord *discordgo.Session) {
 		log.Printf("Failed to send message %s", err)
 	}
 	log.Printf("message to be sent: %s", message)
-}
-
-func GetReminderHandler(w http.ResponseWriter, r *http.Request) {
-	params := mux.Vars(r)
-	id := params["id"]
-	fmt.Println(id)
-	w.Write([]byte("Get"))
-	w.WriteHeader(200)
 }

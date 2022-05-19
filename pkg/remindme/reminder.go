@@ -1,14 +1,9 @@
 package remindme
 
 import (
-	"database/sql"
 	"log"
 	"time"
 )
-
-type ReminderManager struct {
-	Db *sql.DB
-}
 
 func (rm *ReminderManager) CreateInsertReminder(reminder CreateReminder) error {
 	sqlStatement := `
@@ -39,6 +34,7 @@ func (rm *ReminderManager) DeleteReminder(reminder DeleteReminder) error {
 	return nil
 }
 
+// not updating $3 and 4
 func (rm *ReminderManager) UpdateReminder(reminder UpdateReminder) error {
 	sqlStatement := `
 	UPDATE reminder SET title = $2, reminder_message = $3, time_to_remind = $4
@@ -51,6 +47,8 @@ func (rm *ReminderManager) UpdateReminder(reminder UpdateReminder) error {
 	}
 
 	log.Printf("Result of update query: %s", res)
+	log.Printf("reminder_message: %s", reminder.Description)
+	log.Printf("time_to_remind: %s", reminder.ReminderTime)
 	return nil
 }
 

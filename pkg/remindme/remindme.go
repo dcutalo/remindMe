@@ -118,3 +118,39 @@ func (rmapi *RemindMeAPI) DeleteUserHandler(w http.ResponseWriter, r *http.Reque
 	w.Write([]byte("delete user"))
 	w.WriteHeader(200)
 }
+
+func (rmapi *RemindMeAPI) UpdateUserHandler(w http.ResponseWriter, r *http.Request) {
+	var user UpdateUser
+	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
+		w.Write([]byte("unable to decode body"))
+		w.WriteHeader(500)
+		return
+	}
+
+	if err := rmapi.ReminderManager.UpdateUser(user); err != nil {
+		w.Write([]byte(fmt.Sprintf("unable to update user %s", err.Error())))
+		w.WriteHeader(500)
+		return
+	}
+
+	w.Write([]byte("update user"))
+	w.WriteHeader(200)
+}
+
+func (rmapi *RemindMeAPI) GetUserHandler(w http.ResponseWriter, r *http.Request) {
+	var user GetUser
+	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
+		w.Write([]byte("unable to decode body"))
+		w.WriteHeader(500)
+		return
+	}
+
+	if err := rmapi.ReminderManager.GetUser(user); err != nil {
+		w.Write([]byte(fmt.Sprintf("unable to get user %s", err.Error())))
+		w.WriteHeader(500)
+		return
+	}
+
+	w.Write([]byte("get user"))
+	w.WriteHeader(200)
+}
